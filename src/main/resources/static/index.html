@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>课堂笔记记录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #f6f8fa;
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #3a86ff;
+            color: #fff;
+            padding: 1.5rem 0 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(58, 134, 255, 0.1);
+        }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(58, 134, 255, 0.08);
+            padding: 2rem;
+        }
+        label {
+            font-weight: bold;
+            color: #3a86ff;
+            display: block;
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #bde0fe;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        button {
+            background: #3a86ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #265eb7;
+        }
+        .notes-list {
+            margin-top: 2rem;
+        }
+        .note-item {
+            background: #e0f2fe;
+            border-left: 4px solid #3a86ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .note-title {
+            font-weight: bold;
+            color: #265eb7;
+            margin-bottom: 0.5rem;
+        }
+        .note-time {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>课堂笔记记录</h1>
+    <p>记录你的课堂学习内容</p>
+</header>
+<div class="container">
+    <form id="noteForm">
+        <label for="noteTitle">主题</label>
+        <input type="text" id="noteTitle" placeholder="请输入笔记主题" required>
+        <label for="noteContent">内容</label>
+        <textarea id="noteContent" placeholder="请输入课堂笔记内容" required></textarea>
+        <button type="submit">保存笔记</button>
+    </form>
+    <div class="notes-list" id="notesList"></div>
+</div>
+<script>
+    const noteForm = document.getElementById('noteForm');
+    const notesList = document.getElementById('notesList');
+
+    // 从localStorage加载笔记
+    function loadNotes() {
+        notesList.innerHTML = '';
+        const notes = JSON.parse(localStorage.getItem('classNotes') || '[]');
+        notes.reverse().forEach(note => {
+            const div = document.createElement('div');
+            div.className = 'note-item';
+            div.innerHTML = `
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-time">${note.time}</div>
+                    <div class="note-content">${note.content.replace(n/g,"<br>")}</div>
+                `;
+            notesList.appendChild(div);
+        });
+    }
+
+    noteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const title = document.getElementById('noteTitle').value.trim();
+        const content = document.getElementById('noteContent').value.trim();
+        if (!title || !content) return;
+
+        const note = {
+            title,
+            content,
+            time: new Date().toLocaleString()
+        };
+        const notes = JSON.parse(localStorage.getItem('classNotes') || '[]');
+        notes.push(note);
+        localStorage.setItem('classNotes', JSON.stringify(notes));
+        noteForm.reset();
+        loadNotes();
+    });
+
+    window.onload = loadNotes;
+</script>
+</body>
+</html>

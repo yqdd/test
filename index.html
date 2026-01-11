@@ -1,52 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>课堂笔记</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            background: #f6f8fa;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #3a86ff;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            text-align: center;
-        }
-        button {
-            background-color: #3a86ff;
-            border: none;
-            color: #fff;
-            padding: 15px 25px;
-            font-size: 16px;
-            margin: 10px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #265eb7;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>学习记录 - 主页</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<header>
-    <h1>课堂笔记</h1>
-</header>
-<div class="container">
-    <button onclick="location.href='/page1'">第一周</button>
-    <button onclick="location.href='/page2'">第二周</button>
-    <button onclick="location.href='/page3'">第三周</button>
-    <button onclick="location.href='/page4'">第四周</button>
-</div>
+  <header class="site-header">
+    <h1 class="site-title">学习记录</h1>
+    <p class="site-subtitle">期中与期末项目总结（扁平化风格）</p>
+  </header>
+
+  <main class="container">
+    <section class="cards">
+      <article class="card">
+        <h2>期中作业：基于 ESP32-C3 的小车</h2>
+        <p>硬件：ESP32-C3，AT8236 驱动，130 电机、舵机与减速箱；机身用 502 胶粘接。</p>
+        <p class="meta">点击查看详细记录</p>
+        <a class="btn" href="midterm.html" id="open-midterm">去查看 →</a>
+      </article>
+
+      <article class="card">
+        <h2>期末作业：基于 Swing + ESP32 + BNO085 的简单 VR 模拟器</h2>
+        <p>渲染：组件按与相机距离排序并投影；网络：UDP 传输图片与传感器数据。</p>
+        <p class="meta">点击查看详细记录</p>
+        <a class="btn" href="final.html" id="open-final">去查看 →</a>
+      </article>
+    </section>
+
+  <footer class="site-footer">
+    <small>作者：yqdd · 记录日期：2026-01-11</small>
+  </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>

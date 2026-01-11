@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>期末作业：Swing + ESP32 + BNO085 的 VR 模拟器 - 详细记录</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="detail-header">
+    <a class="link-back" id="back-home-2">← 返回主页</a>
+    <h1>期末作业：基于 Swing + ESP32 + BNO085 的简单 VR 模拟器</h1>
+    <p class="subtitle">组件式渲染 + UDP 网络传输 + 手机纸盒 VR 头显</p>
+  </header>
+
+  <main class="container detail">
+    <section class="section" data-section="overview">
+      <h2>概述</h2>
+      <p>该项目实现了一个极简的 VR 模拟器：使用 Java Swing 以组件为单位维护位置三维坐标，按距离相机进行排序后在 2D 屏幕上进行投影渲染。渲染结果在 PC 端压缩为图片并通过 UDP 发给手机，手机端显示图片并将陀螺仪数据回传以更新相机朝向。ESP32（带 BNO085）通过 UDP 把方向数据发给 PC，同时 GPIO 读取按钮用于触发移动，通过 UDP 告知 PC 做相应移动。</p>
+      <button class="toggle-btn" data-target="overview">折叠/展开</button>
+      <button class="copy-btn" data-target="overview">复制本节</button>
+    </section>
+
+    <section class="section" data-section="swing">
+      <h2>Swing 渲染引擎（简介）</h2>
+      <p>实现思路：</p>
+      <ul>
+        <li>组件（Component）包含一个 3D 坐标字段（x,y,z），以及渲染所需的形状或图片引用。</li>
+        <li>渲染前按组件到相机的距离对列表排序，近的后绘制以保证遮挡顺序（简单的 Painter's algorithm）。</li>
+        <li>在屏幕上绘制位置采用“将点在与相机朝向垂直的平面上投影”的方法，把 3D 坐标映射到 2D 坐标。</li>
+      </ul>
+      <p>已实现：</p>
+      <ul>
+        <li>一个简单的立方体组件（使用单点 z-buffer 近似，存在部分渲染异常）。</li>
+        <li>一个 2D 图片树（作为场景背景元素）。</li>
+      </ul>
+      <button class="toggle-btn" data-target="swing">折叠/展开</button>
+      <button class="copy-btn" data-target="swing">复制本节</button>
+    </section>
+
+    <section class="section" data-section="network">
+      <h2>网络与系统通信</h2>
+      <p>系统由三类设备通信：</p>
+      <ol>
+        <li>PC（服务端）：负责渲染 Swing 场景，压缩渲染结果为图片，使用 UDP 将图片分包发给手机；接收手机的陀螺仪数据，并据此更新相机朝向；接收 ESP32 的 BNO085 数据并更新场景中左右两个圆点的方向。</li>
+        <li>手机（客户端/VR 头显）：接收 UDP 图片并显示，读取陀螺仪并发回 PC。</li>
+        <li>ESP32：读取 BNO085（IMU）朝向数据，通过 UDP 将方向数据发给 PC；同时读取按键 GPIO，按下时通过 UDP 发送移动命令（如前进/后退）给 PC。</li>
+      </ol>
+      <p>通信要点：</p>
+      <ul>
+        <li>使用 UDP 可以降低延迟，但要自己处理丢包与分包问题（特别是图片数据）。</li>
+        <li>图片建议做压缩和分片，并在包头增加序列/校验以便客户端重组。</li>
+      </ul>
+      <button class="toggle-btn" data-target="network">折叠/展开</button>
+      <button class="copy-btn" data-target="network">复制本节</button>
+    </section>
+
+    <section class="section" data-section="zbuffer">
+      <h2>渲染细节与问题</h2>
+      <p>当前立方体使用“单点 zbuffer”近似（以立方体中心作为深度判定点），因此部分面会出现渲染异常。后续可以改进为：</p>
+      <ul>
+        <li>为每个三角形或像素维护完整 z-buffer（真实的深度检测）。</li>
+        <li>为多顶点对象做三角剖分与逐像素深度测试。</li>
+      </ul>
+      <button class="toggle-btn" data-target="zbuffer">折叠/展开</button>
+      <button class="copy-btn" data-target="zbuffer">复制本节</button>
+    </section>
+
+    <section class="section" data-section="vr">
+      <h2>VR 展示与手机端</h2>
+      <p>手机作为 VR 头显（利用纸盒）显示从 PC 端收到的图片。手机端主要功能：</p>
+      <ul>
+        <li>从 UDP 接收渲染图片并显示（按帧刷新）。</li>
+        <li>读取陀螺仪并将姿态数据发送回 PC，用于更新相机朝向。</li>
+        <li>若需要更低延迟，可使用更小分辨率或更高压缩比。</li>
+      </ul>
+      <button class="toggle-btn" data-target="vr">折叠/展开</button>
+      <button class="copy-btn" data-target="vr">复制本节</button>
+    </section>
+
+    <section class="section" data-section="conclusion">
+      <h2>总结与优化方向</h2>
+      <ul>
+        <li>网络优化：改用可靠的传输策略或在 UDP 上实现 FEC/重传机制。</li>
+        <li>渲染改进：实现像素级 z-buffer，优化立方体面渲染顺序。</li>
+        <li>图像压缩：使用专门的快速压缩算法（如 JPEG/WEBP）并在发送端做分片重组。</li>
+      </ul>
+      <button class="toggle-btn" data-target="conclusion">折叠/展开</button>
+      <button class="copy-btn" data-target="conclusion">复制本节</button>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>作者：yqdd · 记录日期：2026-01-11</small>
+  </footer>
+
+  <script src="js/final.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
